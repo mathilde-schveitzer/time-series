@@ -9,7 +9,7 @@ warnings.filterwarnings(action='ignore', message='Setting attributes')
 
 def main():
     
-    num_samples, time_steps, input_dim, output_dim = 50_000, 10, 1, 1
+    num_samples, time_steps, input_dim, output_dim = 50000, 10, 1, 1
 
     # Definition of the model.
 
@@ -33,7 +33,7 @@ def main():
     # Train the model.
     print('Pytorch training...')
     model_pytorch.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=20, batch_size=128)
-
+    
     # Save the model for later.
     model_pytorch.save('n_beats_pytorch.th')
 
