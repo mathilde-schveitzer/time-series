@@ -9,6 +9,7 @@ import csv
 import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], trend=[0,1], alea=False, bornes=[-10,10], add_noise=0, plot=True):
     """
@@ -128,7 +129,8 @@ def register_signal(signal,identifiant) :
         writer=csv.writer(csvfile, delimiter=',')
         if np.size(signal.shape)>1 : #signal eventuellement multidimensionnel
             i=signal.shape[1] #it
-            for k in range(i):
+            print(i)
+            for k in tqdm(range(i)):
                 writer.writerow(signal) # generalisation par boucles iteratives
         else :
             writer.writerow(signal)
