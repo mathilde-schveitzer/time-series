@@ -29,7 +29,7 @@ def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], tr
             Must match frequencies_list size. If not, will be automatically completed by "sin"
         bornes: list, 
             Specifies the max and min values for the rand function that will then pick the value of the "an"/"bn" coefficient of the Fourier series
-        trend : list, default : [0,1]
+        trend : list, default : [0,1]>
             Coefficient of a polynomial functions that will give a generall trend to the signal
         add_noise : float, default: 0
             Add random noise to the signal, where `0` has no noise
@@ -90,7 +90,6 @@ def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], tr
        
     return signal,time,length_seconds
 
-
 def perturbation(signal,time,length_seconds):
     '''creates (and shows) a linear piecewise perturbation that matchs with the signal
     Args : 
@@ -118,7 +117,7 @@ def perturbation(signal,time,length_seconds):
     
     return(perturbation)
     
-def register_signal(signal,identifiant) :
+def register_signal(signal,identifiant, copy=1) :
     '''Stores the signal in a csv file
     Args :
         - signal : an array which cointains signal(s) values (eventually multidimensionnel)
@@ -129,11 +128,12 @@ def register_signal(signal,identifiant) :
         writer=csv.writer(csvfile, delimiter=',')
         if np.size(signal.shape)>1 : #signal eventuellement multidimensionnel
             i=signal.shape[1] #it
-            print(i)
-            for k in tqdm(range(i)):
-                writer.writerow(signal) # generalisation par boucles iteratives
+            for iter in range(copy):
+                for k in range(i):
+                    writer.writerow(signal) # generalisation par boucles iteratives
         else :
-            writer.writerow(signal)
+            for iter in range(copy):
+                writer.writerow(signal)
     return(1)  
 
 def read_signal(filename):
