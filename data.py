@@ -33,18 +33,18 @@ def get_data(backast_length, forecast_length, limit, filename,copy=1):
     x_tl_tl = np.zeros((copy,len(x_tl[0])))
     for i in tqdm(range(copy)):
         x_tl_tl[i,:]=x_tl[0]
-    for i in range(x_tl_tl.shape[0]): 
-        time_series = np.array(x_tl_tl[i])
-        time_series = [float(s) for s in time_series if s != '']
-        time_series_cleaned = np.array(time_series)
         
-        time_series_cleaned_fortraining_x = np.zeros((1, backast_length))
-        time_series_cleaned_fortraining_y = np.zeros((1, forecast_length))
+    time_series = np.array(x_tl_tl[i])
+    time_series = [float(s) for s in time_series if s != '']
+    time_series_cleaned = np.array(time_series)
         
-        time_series_cleaned_fortesting_x=np.zeros((1,backast_length))
-        time_series_cleaned_fortesting_y=np.zeros((1, forecast_length))
+    time_series_cleaned_fortraining_x = np.zeros((1, backast_length))
+    time_series_cleaned_fortraining_y = np.zeros((1, forecast_length))
         
+    time_series_cleaned_fortesting_x=np.zeros((1,backast_length))
+    time_series_cleaned_fortesting_y=np.zeros((1, forecast_length))
         
+    for i in range(x_tl_tl.shape[0]):
         j = np.random.randint(backast_length, limit - forecast_length)#version beta : les echantillons sont selectionnes au hasard avec possibilite de redondance
         k= np.random.randint(limit+backast_length, time_series_cleaned.shape[0]-forecast_length)
 
