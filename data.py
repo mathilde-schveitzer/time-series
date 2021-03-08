@@ -1,8 +1,23 @@
 import csv
 import numpy as np
+from tqdm import tqdm
 
 def get_data(backast_length, forecast_length, limit, filename,copy=1):
+    """
+    Create the set of datas that will be used to train the neural networks, from the file filename
     
+    Args :
+         - backast_length : int
+               The number of points used for the prediction (x vector dimension)
+         - forecast_length : int 
+               The number of points predicted (y vector dimension)
+         - limit : int
+               Delimitate the training and the validation set (the validation set will be picked for k>limit only)
+         - filename : string
+               Name of the file that contains the signal, must be a .csv
+         - copy : int
+               After getting the signal, the algo copies it copy times in a numpy array. Each copy corresponds to a sample(x,y)
+"""
     xtrain = np.array([]).reshape(0, backast_length)
     ytrain = np.array([]).reshape(0, forecast_length)
 
@@ -16,7 +31,7 @@ def get_data(backast_length, forecast_length, limit, filename,copy=1):
         for line in reader:
            x_tl.append(line)
     x_tl_tl = np.zeros((copy,len(x_tl[0])))
-    for i in range(copy):
+    for i in tqdm(range(copy)):
         x_tl_tl[i,:]=x_tl[0]
     for i in range(x_tl_tl.shape[0]): 
         time_series = np.array(x_tl_tl[i])
