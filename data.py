@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 
-def get_data(backast_length, forecast_length, limit, filename):
+def get_data(backast_length, forecast_length, limit, filename,copy=1):
     
     xtrain = np.array([]).reshape(0, backast_length)
     ytrain = np.array([]).reshape(0, forecast_length)
@@ -15,8 +15,9 @@ def get_data(backast_length, forecast_length, limit, filename):
         reader = csv.reader(file, delimiter=',')
         for line in reader:
            x_tl.append(line)
-    x_tl_tl = np.array(x_tl)
-    print(x_tl_tl.shape[0])
+    x_tl_tl = np.zeros((copy,len(x_tl[0])))
+    for i in range(copy):
+        x_tl_tl[i,:]=x_tl[0]
     for i in range(x_tl_tl.shape[0]): 
         time_series = np.array(x_tl_tl[i])
         time_series = [float(s) for s in time_series if s != '']

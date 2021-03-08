@@ -11,7 +11,7 @@ import random as rd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], trend=[0,1], alea=False, bornes=[-10,10], add_noise=0, plot=True):
+def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], trend=[0,1], alea=False, bornes=[-10,10], add_noise=0, plot=False):
     """
     Generate a `length_seconds` seconds signal at `sampling_rate` sampling rate. See torchsignal (https://github.com/jinglescode/torchsignal) for more info.
     
