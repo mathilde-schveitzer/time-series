@@ -1,0 +1,35 @@
+I) Essais en cours :
+
+1) Premier essai :
+
+-> Est ce que Generic_Block arrive a annuler la loss ?
+
+   - Set de donnee : 1000*[100]*[100]
+   - Caracteristiques signal : f=[0.5,0.8,0.3,0.9], T=1000, fs=150
+   - Hyperparameters : theta_dim=(4,4), epochs=10000, lr=1e-5, batch_size=128
+
+
+
+
+II) Plan :
+
+-3 blocks a analyser :
+
+   -> Est-ce qu'ils fonctionnent ?
+
+      - Loss qui diminue pour un nombre significatif d'epoch (signaux simples)
+      - Ajout d'une perturbation : est-ce que l'algorithme parvient a predire quelque chose
+
+   -> Est-ce qu'ils ont le comportement attendu ?
+
+      - Est-ce que Seasonnality arrive a chopper les composantes periodiques, pour une, puis deux, frequences (distinctes, proches,...)
+      - Est ce que Trend aboutit sur quelque chose ? Pourquoi est-on restreint en degre ?
+      Pour ces deux points, il faut arriver a recuperer et afficher (ou enregistrer car l'affichage interromp l'execution) le signal dans la fonction forward de model.py
+
+   -> Hypertuning : quels parametres optimisent les blocs : hidden_layer_units, thetas_dim dont les tailles conduisent a des compressions
+
+Partie code :
+       - Modification du programme pour afficher les coubres dans Seasonnality
+       - Modification du programme pour afficher les courbes dans Trend ? (je sais pas trop)
+       - Afficher prediction vs signal ? Trouver comment "etaler" le signal
+       
