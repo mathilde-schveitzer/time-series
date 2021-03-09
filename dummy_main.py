@@ -13,7 +13,7 @@ def main(name,nb_of_samples):
     # we generate the signal which will be analyzed
     length_seconds,sampling_rate=1000, 150 #that makes 15000 pts
     freq_list=[0.5,0.8,0.3,0.9] #pour 4 frequences, loss devient importante
-    print('----creating the signal, plz wait------') 
+    print('----creating the signal, plz wait------')
     sig=gs.generate_signal(length_seconds, sampling_rate, freq_list)
     print('finish : we start storing it in a csv file')
     gs.register_signal(sig[0],name)
