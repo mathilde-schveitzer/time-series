@@ -2,6 +2,7 @@ import pickle
 import random
 from time import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn, optim
@@ -94,15 +95,21 @@ class NBeatsNet(nn.Module):
 
     def fit(self, x_train, y_train, validation_data=None, epochs=10, batch_size=32):
 
+        store_loss=np.zeros(epochs)
+        store_validation_loss=np.zeros(epochs)
+        xplot=np.arange(epochs)
+        
         def split(arr, size):
             arrays = []
             while len(arr) > size:
                 slice_ = arr[:size]
+
                 arrays.append(slice_)
                 arr = arr[size:]
             arrays.append(arr)
             return arrays
 
+        
         for epoch in range(epochs):
             x_train_list = split(x_train, batch_size)
             y_train_list = split(y_train, batch_size)
@@ -122,14 +129,15 @@ class NBeatsNet(nn.Module):
                 self._opt.step()
             elapsed_time = time() - timer
             train_loss = np.mean(train_loss)
+            store_loss[epoch]=train_loss
 
             test_loss = '[undefined]'
             if validation_data is not None:
                 x_test, y_test = validation_data
                 self.eval()
                 _, forecast = self(torch.tensor(x_test, dtype=torch.float).to(self.device))
-                test_loss = self._loss(forecast, squeeze_last_dim(torch.tensor(y_test, dtype=torch.float))).item()
-
+                test_loss = self._loss(forecast, squeeze_last_dim(torch.tensor(y_test, dtype=torch.float).to(self.device))).item()
+                store_validation_loss[epoch]=test_loss
             num_samples = len(x_train_list)
             time_per_step = int(elapsed_time / num_samples * 1000)
             print(f'Epoch {str(epoch + 1).zfill(len(str(epochs)))}/{epochs}')
@@ -137,10 +145,16 @@ class NBeatsNet(nn.Module):
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
 
+        plt.plot(xplot, store_loss, label='train loss')
+        plt.plot(xplot, store_validation_loss, label='validation loss')
+        plt.legend()
+        plt.show()
+
+        
     def predict(self, x, return_backcast=False):
         self.eval()
         b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
-        b, f = b.detach().numpy(), f.detach().numpy()
+        b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
         if len(x.shape) == 3:
             b = np.expand_dims(b, axis=-1)
             f = np.expand_dims(f, axis=-1)
