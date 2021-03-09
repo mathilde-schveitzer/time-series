@@ -2,6 +2,7 @@ import pickle
 import random
 from time import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn, optim
@@ -94,7 +95,11 @@ class NBeatsNet(nn.Module):
 
     def fit(self, x_train, y_train, validation_data=None, epochs=10, batch_size=32):
 
-        def split(arr, size):
+        store_loss=np.zeros(epochs)
+        store_validation_loss=np.zeros(epochs)
+        xplot=np.arange(epochs)
+
+        def split(arr, size): #fonction qui splite arr en mini tableau de taille max size (taille des batchs), en conservant la seconde dimension (=backast)
             arrays = []
             while len(arr) > size:
                 slice_ = arr[:size]
@@ -104,6 +109,7 @@ class NBeatsNet(nn.Module):
             return arrays
 
         for epoch in range(epochs):
+            """On commence par separer xtrain et ytrain en petits xtrain/ytrain de taille batch_size, en preservant les dimensions backcast et forecast : on fabrique les batch donc"""
             x_train_list = split(x_train, batch_size)
             y_train_list = split(y_train, batch_size)
             assert len(x_train_list) == len(y_train_list)
@@ -112,6 +118,7 @@ class NBeatsNet(nn.Module):
             self.train()
             train_loss = []
             timer = time()
+            """Pour chaque batch (ordre de traitement aleatoire), on fait les fonctions d'optim"""
             for batch_id in shuffled_indices:
                 batch_x, batch_y = x_train_list[batch_id], y_train_list[batch_id]
                 self._opt.zero_grad()
@@ -122,6 +129,7 @@ class NBeatsNet(nn.Module):
                 self._opt.step()
             elapsed_time = time() - timer
             train_loss = np.mean(train_loss)
+            store_loss[epoch]=train_loss
 
             test_loss = '[undefined]'
             if validation_data is not None:
@@ -129,6 +137,7 @@ class NBeatsNet(nn.Module):
                 self.eval()
                 _, forecast = self(torch.tensor(x_test, dtype=torch.float).to(self.device))
                 test_loss = self._loss(forecast, squeeze_last_dim(torch.tensor(y_test, dtype=torch.float))).item()
+                store_validation_loss[epoch]=test_loss
 
             num_samples = len(x_train_list)
             time_per_step = int(elapsed_time / num_samples * 1000)
@@ -136,11 +145,15 @@ class NBeatsNet(nn.Module):
             print(f'{num_samples}/{num_samples} [==============================] - '
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
+        plt.plot(xplot, store_loss, label='train loss')
+        plt.plot(xplot, store_validation_loss, label='validation loss')
+        plt.legend()
+        plt.show()
 
     def predict(self, x, return_backcast=False):
         self.eval()
         b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
-        b, f = b.detach().numpy(), f.detach().numpy()
+        b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
         if len(x.shape) == 3:
             b = np.expand_dims(b, axis=-1)
             f = np.expand_dims(f, axis=-1)
@@ -151,6 +164,7 @@ class NBeatsNet(nn.Module):
     def forward(self, backcast):
         backcast = squeeze_last_dim(backcast)
         forecast = torch.zeros(size=(backcast.size()[0], self.forecast_length,))  # maybe batch size here.
+
         for stack_id in range(len(self.stacks)):
             for block_id in range(len(self.stacks[stack_id])):
                 b, f = self.stacks[stack_id][block_id](backcast)
