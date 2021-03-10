@@ -145,11 +145,12 @@ class NBeatsNet(nn.Module):
             print(f'{num_samples}/{num_samples} [==============================] - '
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
-        plt.plot(xplot, store_loss, label='train loss')
-        plt.plot(xplot, store_validation_loss, label='validation loss')
-        plt.legend()
-        plt.show()
-
+        plt.plot(xplot, store_loss, label='train loss_{}'.format(self.stack_types[0]))
+        plt.plot(xplot, store_validation_loss, label='validation loss_{}'.format(self.stack_types[0]))
+        plt.legend(loc='best')
+    
+        plt.show(block=False)
+#plt.legend(str(self.stack_types))
     def predict(self, x, return_backcast=False):
         self.eval()
         b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
