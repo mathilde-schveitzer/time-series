@@ -135,12 +135,10 @@ def register_signal(signal,identifiant) :
     return(1)  
 
 def read_signal(filename):
-    name='{}.csv'.format(filename)
     x_tl=[]
-    with open(name, "r") as file:
+    with open(filename, "r") as file:
         reader = csv.reader(file, delimiter=',')
         #un peu space mais l'idée est de se débarasser des en-têtes
         for line in reader:
             x_tl.append(line)
-    print(x_tl)
-    return(1)
+    return(np.array(x_tl))
