@@ -150,12 +150,12 @@ class NBeatsNet(nn.Module):
         plt.legend(loc='best')
     
         plt.show(block=False)
-#plt.legend(str(self.stack_types))
+
     def predict(self, x, return_backcast=False):
         self.eval()
         b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
         b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
-        if len(x.shape) == 3:
+        if len(x.shape) == 3: #je comprends pas trop ce qui se passe ici
             b = np.expand_dims(b, axis=-1)
             f = np.expand_dims(f, axis=-1)
         if return_backcast:
