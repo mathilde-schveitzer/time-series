@@ -6,7 +6,6 @@ import random as rd
 
 def main(signal,predictions):
 
-
     def merge_line(a,b,k):
         merge=np.zeros(a.shape[1]+b.shape[1])
         merge[:a.shape[1]]=a[k,:]
@@ -32,12 +31,11 @@ def main(signal,predictions):
         prediction3_to_plot=np.loadtxt(predictions[2])
         plt.plot(merge_line(xtrain,prediction3_to_plot,k), label='Predicted with Trendy Block')
 
+    print(signal) #aide memoire
     plt.legend(loc='best')
-   # plt.show(block=False)
-
     plt.show()
-
-
+    
+    
 if __name__ == '__main__' :
 
     parser=argparse.ArgumentParser()

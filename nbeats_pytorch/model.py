@@ -93,7 +93,7 @@ class NBeatsNet(nn.Module):
         self._opt = optim.Adam(lr=learning_rate, params=self.parameters())
         self._loss = loss_
 
-    def fit(self, x_train, y_train, validation_data=None, epochs=10, batch_size=32):
+    def fit(self, x_train, y_train, filename, validation_data=None, epochs=10, batch_size=32):
 
         store_loss=np.zeros(epochs)
         store_validation_loss=np.zeros(epochs)
@@ -107,7 +107,7 @@ class NBeatsNet(nn.Module):
                 arr = arr[size:]
             arrays.append(arr)
             return arrays
-
+       #elements=torch.zeros(size=(epochs,len(self.stacks),len(x_train_list),batch_size,self.forecast_length)).to(self.device)
         for epoch in range(epochs):
             """On commence par separer xtrain et ytrain en petits xtrain/ytrain de taille batch_size, en preservant les dimensions backcast et forecast : on fabrique les batch donc"""
             x_train_list = split(x_train, batch_size)
@@ -123,6 +123,7 @@ class NBeatsNet(nn.Module):
                 batch_x, batch_y = x_train_list[batch_id], y_train_list[batch_id]
                 self._opt.zero_grad()
                 _, forecast = self(torch.tensor(batch_x, dtype=torch.float).to(self.device))
+               #elements[:,batch_id,:,:]=element
                 loss = self._loss(forecast, squeeze_last_dim(torch.tensor(batch_y, dtype=torch.float).to(self.device)))
                 train_loss.append(loss.item())
                 loss.backward()
@@ -136,7 +137,7 @@ class NBeatsNet(nn.Module):
                 x_test, y_test = validation_data
                 self.eval()
                 _, forecast = self(torch.tensor(x_test, dtype=torch.float).to(self.device))
-                test_loss = self._loss(forecast, squeeze_last_dim(torch.tensor(y_test, dtype=torch.float))).item()
+                test_loss = self._loss(forecast, squeeze_last_dim(torch.tensor(y_test, dtype=torch.float)).to(self.device)).item()
                 store_validation_loss[epoch]=test_loss
 
             num_samples = len(x_train_list)
@@ -145,15 +146,17 @@ class NBeatsNet(nn.Module):
             print(f'{num_samples}/{num_samples} [==============================] - '
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
+
         plt.plot(xplot, store_loss, label='train loss_{}'.format(self.stack_types[0]))
         plt.plot(xplot, store_validation_loss, label='validation loss_{}'.format(self.stack_types[0]))
         plt.legend(loc='best')
-    
         plt.show(block=False)
+
+       #torch.save(elements, 'element_{}.pt'.format(filename))
 
     def predict(self, x, return_backcast=False):
         self.eval()
-        b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
+        b, f = self(torch.tensor(x, dtype=torch.float).to(self.device),True)
         b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
         if len(x.shape) == 3: #je comprends pas trop ce qui se passe ici
             b = np.expand_dims(b, axis=-1)
@@ -162,15 +165,16 @@ class NBeatsNet(nn.Module):
             return b, f
         return f
 
-    def forward(self, backcast):
+    def forward(self, backcast, print_season = False):
         backcast = squeeze_last_dim(backcast)
-        forecast = torch.zeros(size=(backcast.size()[0], self.forecast_length,))  # maybe batch size here.
-
+        forecast = torch.zeros(size=(backcast.size()[0], self.forecast_length,))
+       # element=torch.zeros(size=(len(self.stacks),backcast.size()[0], self.forecast_length))
         for stack_id in range(len(self.stacks)):
             for block_id in range(len(self.stacks[stack_id])):
-                b, f = self.stacks[stack_id][block_id](backcast)
+                b, f = self.stacks[stack_id][block_id](backcast,print_season)
                 backcast = backcast.to(self.device) - b
                 forecast = forecast.to(self.device) + f
+      #          element[stack_id,:,:]=element[stack_id,:,:].to(self.device) + f
         return backcast, forecast
 
 
@@ -180,13 +184,19 @@ def squeeze_last_dim(tensor):
     return tensor
 
 
-def seasonality_model(thetas, t, device):
+def seasonality_model(thetas, t, device, print_season=False):
     p = thetas.size()[-1]
     assert p <= thetas.shape[1], 'thetas_dim is too big.'
     p1, p2 = (p // 2, p // 2) if p % 2 == 0 else (p // 2, p // 2 + 1)
     s1 = torch.tensor([np.cos(2 * np.pi * i * t) for i in range(p1)]).float()  # H/2-1
     s2 = torch.tensor([np.sin(2 * np.pi * i * t) for i in range(p2)]).float()
     S = torch.cat([s1, s2])
+    if print_season:
+        print('-----------seasonality_model-----------------')
+        print("THETA DIM: " + str(thetas.size()))
+        print("S DIM: " + str(S.size()))
+        print(thetas)
+        
     return thetas.mm(S.to(device))
 
 
@@ -251,10 +261,10 @@ class SeasonalityBlock(Block):
             super(SeasonalityBlock, self).__init__(units, forecast_length, device, backcast_length,
                                                    forecast_length, share_thetas=True)
 
-    def forward(self, x):
+    def forward(self, x, print_season=False):
         x = super(SeasonalityBlock, self).forward(x)
-        backcast = seasonality_model(self.theta_b_fc(x), self.backcast_linspace, self.device)
-        forecast = seasonality_model(self.theta_f_fc(x), self.forecast_linspace, self.device)
+        backcast = seasonality_model(self.theta_b_fc(x), self.backcast_linspace, self.device, False)
+        forecast = seasonality_model(self.theta_f_fc(x), self.forecast_linspace, self.device, print_season)
         return backcast, forecast
 
 
