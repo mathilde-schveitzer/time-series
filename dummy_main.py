@@ -32,8 +32,10 @@ def main(name,copy,device='cpu'):
 
     model1.save('nbeats_test_seasonality.h5')
 
-    predictions=model1.predict(xtest)
-    print(predictions.shape)
+    predictions1=model1.predict(xtrain)
+
+    np.savetxt('predictions_seasonality_{}.txt'.format(name),predictions1)
+   # print(predictions.shape)
 
     #Definition of the generic  model :
     thetas_dim2=4,
@@ -45,10 +47,11 @@ def main(name,copy,device='cpu'):
     #model training
     model2.fit(xtrain, ytrain, validation_data=(xtest,ytest), epochs=100, batch_size=10)
 
-    model2.save('nbeats_test_seasonality.h5')
+    model2.save('nbeats_test_generic.h5')
 
-    predictions=model2.predict(xtest)
-    print(predictions.shape)
+    predictions2=model2.predict(xtrain)
+    np.savetxt('predictions_generic_{}.txt'.format(name),predictions2)
+   # print(predictions.shape)
 
      #Definition of the trend model :
     thetas_dim3=4,
@@ -61,13 +64,13 @@ def main(name,copy,device='cpu'):
     
     model3.fit(xtrain, ytrain, validation_data=(xtest,ytest), epochs=100, batch_size=10)
 
-    model3.save('nbeats_test_seasonality.h5')
+    model3.save('nbeats_test_trend.h5')
 
-    predictions=model3.predict(xtest)
-    print(predictions.shape)
+    predictions3=model3.predict(xtrain)
+    np.savetxt('predictions_trend_{}.txt'.format(name),predictions3)
+    # print(predictions.shape)
     plt.show()
 if __name__ == '__main__':
-    
     parser=argparse.ArgumentParser()
     parser.add_argument('name', help='Name of the storing file')
     parser.add_argument('nb_of_samples', help='Precise the number of samples that will be picked')
