@@ -14,51 +14,38 @@ def main(signal,predictions):
     
     plt.figure(figsize=(10,10))
     
-    xtrain=np.loadtxt('xtrain_{}.txt'.format(signal))
-    ytrain=np.loadtxt('ytrain_{}.txt'.format(signal))
+    xtrain=np.loadtxt('./data/{}/datas/xtrain.txt'.format(signal))
+    ytrain=np.loadtxt('./data/{}/datas/ytrain.txt'.format(signal))
 
     k=rd.randint(0,xtrain.shape[0])
     
     plt.plot(merge_line(xtrain,ytrain,k),label='original signal')
 
-    if not predictions[0]=='':
-        prediction_to_plot=np.loadtxt(predictions[0])
+    predictionpath='./data/{}/predictions/'.format(signal)
+    
+    if not predictions[0]==None:
+        prediction_to_plot=np.loadtxt(predictionpath+'generic.txt')
         plt.plot(merge_line(xtrain,prediction_to_plot,k),label='Predicted with Generic Block')
-    if not predictions[1]=='' :
-        prediction2_to_plot=np.loadtxt(predictions[1])
+    if not predictions[1]==None :
+        prediction2_to_plot=np.loadtxt(predictionpath+'seasonnality.txt')
         plt.plot(merge_line(xtrain,prediction2_to_plot,k), label='Predicted with Seasonnability Block')
-    if not predictions[2]=='' :
-        prediction3_to_plot=np.loadtxt(predictions[2])
+    if not predictions[2]==None :
+        prediction3_to_plot=np.loadtxt(predictionpath+'trend.txt')
         plt.plot(merge_line(xtrain,prediction3_to_plot,k), label='Predicted with Trendy Block')
 
     print(signal) #aide memoire
     plt.legend(loc='best')
-    plt.show()
+    plt.title('predictions')
+    plt.savefig('./data/{}/out/predictions.png'.format(signal))
     
     
 if __name__ == '__main__' :
 
     parser=argparse.ArgumentParser()
     parser.add_argument('signal', help='Name of the signal analyzed : signal')
-    parser.add_argument('-p1', help='Prediction : Generic is expected ')
-    parser.add_argument('-p2', help='Prediction : Seasonnality is expected')
-    parser.add_argument('-p3', help='Prediction : Trend is expected')
+    parser.add_argument('-p1', help='Prediction : Generic is expected (just say yes) ')
+    parser.add_argument('-p2', help='Prediction : Seasonnality is expected (just say yes)')
+    parser.add_argument('-p3', help='Prediction : Trend is expected (just say yes)')
     args=parser.parse_args()
-    n=len(vars(args))
-    assert n>1, 'plz provide at least one prediction'
-    if n==4:
-        main(args.signal,[args.p1,args.p2,args.p3])
-    elif n==3 :
-        if not args.p1 :
-            main(args.signal,['',args.p2,args.p3])
-        elif not args.p2 :
-            main(args.signal,[args.p1,'',args.p3])
-        else :
-            main(args.signal,[args.p1,args.p2,''])
-    else :
-        if args.p1 :
-            main(args.signal,[args.p1,'',''])
-        elif args.p2 :
-            main(args.signal,['',args.p2,''])
-        else :
-            main(args.signal,['','',args.p3])                         
+    main(args.signal,[args.p1,args.p2,args.p3])
+  
