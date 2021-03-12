@@ -14,7 +14,6 @@ from tqdm import tqdm
 def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], trend=[0,1], alea=False, bornes=[-10,10], add_noise=0, plot=False):
     """
     Generate a `length_seconds` seconds signal at `sampling_rate` sampling rate. See torchsignal (https://github.com/jinglescode/torchsignal) for more info.
-    
     Args:
         length_seconds : int
             Duration of signal in seconds (i.e. `10` for a 10-seconds signal)
@@ -78,10 +77,13 @@ def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], tr
                 signal = signal + np.sin(2*np.pi*frequencies_list[k]*time)
     
     for t in range(len(signal)) :       
-        signal[t]=sum(trend[k]*signal[t]**k for k in range(len(trend)))
+        amplitude = np.random.uniform(low=0, high=10, size=(len(trend),))
+        signal[t]=sum(amplitude[k]*trend[k]*signal[t]**k for k in range(len(trend)))
                
-    if add_noise:        
-        noise = np.random.uniform(low=0, high=add_noise, size=(frequencies_list.shape[0],npnts))
+    if add_noise:
+        print(signal.shape)
+        noise = np.random.uniform(low=0, high=add_noise, size=(npnts,))
+        print(noise.shape)
         signal = signal + noise
 
     if plot:
