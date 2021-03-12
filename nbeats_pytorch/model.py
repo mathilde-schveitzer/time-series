@@ -150,7 +150,7 @@ class NBeatsNet(nn.Module):
         plt.plot(xplot, store_loss, label='train loss_{}'.format(self.stack_types[0]))
         plt.plot(xplot, store_validation_loss, label='validation loss_{}'.format(self.stack_types[0]))
         plt.legend(loc='best')
-        plt.show(block=False)
+        plt.title('Loss evolution')
 
        #torch.save(elements, 'element_{}.pt'.format(filename))
 
