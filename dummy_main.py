@@ -22,7 +22,6 @@ def main(name,epochs=10,device='cpu'):
     xtest=np.loadtxt(datapath+'/xtest.txt'.format(name))
     ytest=np.loadtxt(datapath+'/ytest.txt'.format(name))
     print('-------we got the DATA dude : it works ------------')
-
     #Reminder of the hyperparameter
     backcast_length=100
     forecast_length = 100
@@ -30,8 +29,8 @@ def main(name,epochs=10,device='cpu'):
 
     
     #Definition of the seasonality  model :
-    thetas_dim1=4,
-    stack_types1=NBeatsNet.SEASONALITY_BLOCK,
+    thetas_dim1=(4,4)
+    stack_types1=(NBeatsNet.SEASONALITY_BLOCK,NBeatsNet.SEASONALITY_BLOCK)
     model1= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types1, nb_blocks_per_stack=1, thetas_dim=thetas_dim1, share_weights_in_stack=True, hidden_layer_units=64)
 
     model1.compile_model(loss='mae', learning_rate=1e-5)
@@ -42,7 +41,6 @@ def main(name,epochs=10,device='cpu'):
 
     model1.save('nbeats_test_seasonality.h5')
 
-    print("START PREDICT")
     predictions1=model1.predict(xtrain)
 
     np.savetxt(predictionpath+'seasonnality.txt',predictions1)
@@ -84,7 +82,7 @@ def main(name,epochs=10,device='cpu'):
 if __name__ == '__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('name', help='Name of the storing file')
-    parser.add_argument('epochs', help='Number of epochs')
+    parser.add_argument('-epochs', help='Number of epochs')
     parser.add_argument('-device', help='The device used to execute the algo : cpu or cuda:k')
     args=parser.parse_args()
     if not args.device :
@@ -93,4 +91,7 @@ if __name__ == '__main__':
         else :
             main(args.name,epochs=int(args.epochs))
     else :
-        main(args.name,str(args.device))
+        if not args.epochs :
+            main(args.name,str(args.device))
+        else :
+            main(args.name,int(args.epochs),str(args.device))
