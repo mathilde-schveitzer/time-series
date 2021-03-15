@@ -35,7 +35,7 @@ def main(signal, epochs, nb, predictions, nblock=0):
    
         k=rd.randint(0,xtrain.shape[0])
 
-        plt.plot(merge_line(xtrain,ytrain,k),label='original signal')
+        plt.plot(merge_line(xtrain,ytrain,k),label="original signal")
     
         if rep[0]==1 :
             plt.plot(merge_line(xtrain,prediction_to_plot,k),label='Predicted with Generic Block')
@@ -45,8 +45,8 @@ def main(signal, epochs, nb, predictions, nblock=0):
             plt.plot(merge_line(xtrain,prediction3_to_plot,k), label='Predicted with Trendy Block')
        
         for id_block in range(nblock):
-            prediction_per_block=np.loadtxt(predictionpath+'seasonality_per_block_{}_{}.txt'.format(id_block,epochs))
-            plt.plot(merge_line(xtrain,prediction_per_block,k),label='Predicted with block num = {}'.format(id_block))
+            prediction_per_block=np.loadtxt(predictionpath+"seasonality_per_block_{}_{}.txt".format(id_block,epochs))
+            plt.plot(merge_line(xtrain,prediction_per_block,k),label="Predicted with block num = {}".format(id_block))
         plt.title('predictions num={}'.format(i))
         plt.savefig('./data/{}/out/predictions{}.png'.format(signal,i))
         plt.legend(loc='best')

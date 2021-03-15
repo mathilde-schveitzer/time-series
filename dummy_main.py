@@ -30,8 +30,8 @@ def main(name,epochs=10,device='cpu'):
     
     #Definition of the seasonality  model :
     thetas_dim1=(4,4)
-    stack_types1=(NBeatsNet.SEASONALITY_BLOCK,NBeatsNet.SEASONALITY_BLOCK)
-    model1= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types1, nb_blocks_per_stack=1, thetas_dim=thetas_dim1, share_weights_in_stack=True, hidden_layer_units=64)
+    stack_types1=(NBeatsNet.SEASONALITY_BLOCK)
+    model1= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types1, nb_blocks_per_stack=2, thetas_dim=thetas_dim1, share_weights_in_stack=True, hidden_layer_units=64)
 
     model1.compile_model(loss='mae', learning_rate=1e-5)
     plt.figure(figsize=(10,10))

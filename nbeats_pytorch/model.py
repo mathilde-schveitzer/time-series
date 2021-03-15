@@ -180,13 +180,13 @@ class NBeatsNet(nn.Module):
                 backcast = backcast.to(self.device) - b
                 forecast = forecast.to(self.device) + f
         if predict :
-            prediction=torch.zeros(size=(len(self.stacks), backcast.size()[0], self.forecast_length)).to(self.device)
+            prediction=torch.zeros(size=(len(self.stacks[0]), backcast.size()[0], self.forecast_length)).to(self.device)
             for stack_id in range(len(self.stacks)):
                 for block_id in range(len(self.stacks[stack_id])):
                     b, f = self.stacks[stack_id][block_id](backcast)
                     backcast = backcast.to(self.device) - b
                     forecast = forecast.to(self.device) + f
-                prediction[stack_id,:,:]=forecast
+                    prediction[block_id,:,:]=forecast
             print('---------------- dim predict {} -----------'.format(prediction.size()))
             return backcast, forecast, prediction
         else :

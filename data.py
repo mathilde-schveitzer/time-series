@@ -48,7 +48,6 @@ def get_data(backast_length, forecast_length, limit, filename,copy=1):
         j = np.random.randint(backast_length, limit - forecast_length)#version beta : les echantillons sont selectionnes au hasard avec possibilite de redondance
         k= np.random.randint(limit+backast_length, time_series_cleaned.shape[0]-forecast_length)
 
-
         time_series_cleaned_fortraining_x[0, :] = time_series_cleaned[j - backast_length: j]
         time_series_cleaned_fortraining_y[0, :] = time_series_cleaned[j:j + forecast_length]
         

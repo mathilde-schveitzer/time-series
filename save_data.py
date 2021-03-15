@@ -26,7 +26,7 @@ def main(name,iterations=1000):
 
     # we generate the signal which will be analyzed
     length_seconds,sampling_rate=1000, 150 #that makes 15000 pts
-    freq_list=[0.5]
+    freq_list=[0.05]
     print('----creating the signal, plz wait------')
     sig=gs.generate_signal(length_seconds, sampling_rate, freq_list)
     print('finish : we start storing it in a csv file')
