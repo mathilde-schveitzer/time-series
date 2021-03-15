@@ -35,14 +35,14 @@ def main(name,epochs=10,device='cpu'):
 
     model1.compile_model(loss='mae', learning_rate=1e-5)
     plt.figure(figsize=(10,10))
-
     #model training
     model1.fit(xtrain, ytrain, name, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
 
     model1.save('nbeats_test_seasonality.h5')
 
-    predictions1=model1.predict(xtrain)
-
+    predictions1,elt=model1.predict(xtrain)
+    
+    torch.save(predictionpath+'seasonalityperblock.pt', elt)
     np.savetxt(predictionpath+'seasonnality.txt',predictions1)
 
     #Definition of the generic  model :

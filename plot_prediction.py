@@ -5,7 +5,7 @@ import argparse
 import random as rd
 from tqdm import tqdm
 
-def main(signal,nb,predictions):
+def main(signal,nb,predictions, plot_forecast=False):
 
     def merge_line(a,b,k):
         merge=np.zeros(a.shape[1]+b.shape[1])
@@ -32,7 +32,7 @@ def main(signal,nb,predictions):
 
         
     for i in tqdm(range(nb)) :
-  '/home/mathilde/time-series/data/lowfrequency2Sblocks/out/predictions0.png'       plt.figure(figsize=(10,10))
+        plt.figure(figsize=(10,10))
    
         k=rd.randint(0,xtrain.shape[0])
 
@@ -46,12 +46,9 @@ def main(signal,nb,predictions):
             plt.plot(merge_line(xtrain,prediction3_to_plot,k), label='Predicted with Trendy Block')
         plt.title('predictions num={}'.format(i))
         plt.savefig('./data/{}/out/predictions{}.png'.format(signal,i))
- 
-
-    print(signal) #aide memoire
-    plt.legend(loc='best')
-    
-    
+        plt.legend(loc='best')
+        if plot_forecast :
+            
 if __name__ == '__main__' :
 
     parser=argparse.ArgumentParser()
@@ -60,8 +57,17 @@ if __name__ == '__main__' :
     parser.add_argument('-p1', help='Prediction : Generic is expected (just say yes) ')
     parser.add_argument('-p2', help='Prediction : Seasonnality is expected (just say yes)')
     parser.add_argument('-p3', help='Prediction : Trend is expected (just say yes)')
+    parser.add_argument('-f', help='Say true if you want to plot what each block is predicting')
     args=parser.parse_args()
     if args.idd :
-        main(args.signal,int(args.idd),[args.p1,args.p2,args.p3])
+        if ars.f :
+            main(args.signal,int(args.idd),[args.p1,args.p2,args.p3],True)
+        else :
+            main(args.signal,int(args.idd),[args.p1,args.p2,args.p3],True)
+      
     else :
-        main(args.signal,10,[args.p1,args.p2,args.p3])
+        if args.f :
+            main(args.signal,10,[args.p1,args.p2,args.p3], True)
+        else :
+            main(args.signal,10,[args.p1,args.p2,args.p3])
+      
