@@ -42,8 +42,9 @@ def main(name,epochs=10,device='cpu'):
 
     predictions1,elt=model1.predict(xtrain,return_prediction=True)
     
-    torch.save(predictionpath+'seasonalityperblock.pt', elt)
-    np.savetxt(predictionpath+'seasonnality.txt',predictions1)
+    np.savetxt(predictionpath+'seasonalityperblock_{}.pt'.format(epochs), elt)
+    np.savetxt(predictionpath+'seasonnality_{}.txt'.format(epochs),predictions1)
+
 
     #Definition of the generic  model :
   # thetas_dim2=4,
@@ -76,7 +77,9 @@ def main(name,epochs=10,device='cpu'):
  #   predictions3=model3.predict(xtrain)
    # np.savetxt(predictionpath+trend),predictions3)
 
-    plt.savefig('./data/{}/out/loss.png'.format(name))
+    plt.savefig('./data/{}/out/loss{}.png'.format(name,epochs))
+
+    print('---------- your signal name is {}, and the number of epochs was {} --------'.format(name,epochs))
 
     
 if __name__ == '__main__':

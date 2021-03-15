@@ -5,7 +5,8 @@ import argparse
 import random as rd
 from tqdm import tqdm
 
-def main(signal,nb,predictions, plot_forecast=False):
+
+def main(signal, epochs, nb, predictions, plot_forecast=False):
 
     def merge_line(a,b,k):
         merge=np.zeros(a.shape[1]+b.shape[1])
@@ -21,15 +22,16 @@ def main(signal,nb,predictions, plot_forecast=False):
 
     rep=[0,0,0]
     if not predictions[0]==None:
-        prediction_to_plot=np.loadtxt(predictionpath+'generic.txt')
+        prediction_to_plot=np.loadtxt(predictionpath+'generic_{}.txt'.format(epochs))
         rep[0]=1
     if not predictions[1]==None :
-        prediction2_to_plot=np.loadtxt(predictionpath+'seasonnality.txt')
+        prediction2_to_plot=np.loadtxt(predictionpath+'seasonnality_{}.txt'.format(epochs))
         rep[1]=1
     if not predictions[2]==None :
-        prediction3_to_plot=np.loadtxt(predictionpath+'trend.txt')
+        prediction3_to_plot=np.loadtxt(predictionpath+'trend_{}.txt'.format(epochs))
         rep[2]=1
-
+    if plot_prediction :
+        prediction_per_block=np.loadtxt(predictionpath+'seasonalityperblock_{}.txt'.format(epochs)) 
         
     for i in tqdm(range(nb)) :
         plt.figure(figsize=(10,10))
@@ -47,27 +49,28 @@ def main(signal,nb,predictions, plot_forecast=False):
         plt.title('predictions num={}'.format(i))
         plt.savefig('./data/{}/out/predictions{}.png'.format(signal,i))
         plt.legend(loc='best')
-        if plot_forecast :
+
+        if plot_prediction :
+            plt.figure(figsize=(10,10))
+            for id_block in range(prediction_per_block.shape[0]):
+                plt.plot(merge_line(xtrain,prediction_per_block[id_block,:,:],k), label='Forecast predicted with block num{}'.format(id_block))
+            plt.title('predictions num={}'.format(i))
+            plt.savefig('./data/{}/out/predictions_per_block{}.png'.format(signal,i))
+            plt.legend(loc='best')
+ 
             
 if __name__ == '__main__' :
 
     parser=argparse.ArgumentParser()
     parser.add_argument('signal', help='Name of the signal analyzed : signal')
-    parser.add_argument('-idd', help='In order to store prediction without destroying other files')
+    parser.add_argument('epochs', help='indicate the number of epochs (used to find out the predictions files)')
+    parser.add_argument('nb', help='The number of predictions that will be ploted')
     parser.add_argument('-p1', help='Prediction : Generic is expected (just say yes) ')
     parser.add_argument('-p2', help='Prediction : Seasonnality is expected (just say yes)')
     parser.add_argument('-p3', help='Prediction : Trend is expected (just say yes)')
     parser.add_argument('-f', help='Say true if you want to plot what each block is predicting')
     args=parser.parse_args()
-    if args.idd :
-        if ars.f :
-            main(args.signal,int(args.idd),[args.p1,args.p2,args.p3],True)
-        else :
-            main(args.signal,int(args.idd),[args.p1,args.p2,args.p3],True)
-      
+    if args.f :
+        main(args.signal, int(args.epochs),int(args.nb),[args.p1,args.p2,args.p3], True)
     else :
-        if args.f :
-            main(args.signal,10,[args.p1,args.p2,args.p3], True)
-        else :
-            main(args.signal,10,[args.p1,args.p2,args.p3])
-      
+        main(args.signal,int(args.epochs), int(args.nb),[args.p1,args.p2,args.p3])
