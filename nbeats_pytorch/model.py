@@ -107,7 +107,6 @@ class NBeatsNet(nn.Module):
                 arr = arr[size:]
             arrays.append(arr)
             return arrays
-       #elements=torch.zeros(size=(epochs,len(self.stacks),len(x_train_list),batch_size,self.forecast_length)).to(self.device)
         for epoch in range(epochs):
             """On commence par separer xtrain et ytrain en petits xtrain/ytrain de taille batch_size, en preservant les dimensions backcast et forecast : on fabrique les batch donc"""
             x_train_list = split(x_train, batch_size)
@@ -123,7 +122,6 @@ class NBeatsNet(nn.Module):
                 batch_x, batch_y = x_train_list[batch_id], y_train_list[batch_id]
                 self._opt.zero_grad()
                 _, forecast = self(torch.tensor(batch_x, dtype=torch.float).to(self.device))
-               #elements[:,batch_id,:,:]=element
                 loss = self._loss(forecast, squeeze_last_dim(torch.tensor(batch_y, dtype=torch.float).to(self.device)))
                 train_loss.append(loss.item())
                 loss.backward()
@@ -154,28 +152,41 @@ class NBeatsNet(nn.Module):
 
        #torch.save(elements, 'element_{}.pt'.format(filename))
 
-    def predict(self, x, return_backcast=False):
+    def predict(self, x, return_backcast=False, return_prediction=False):
         self.eval()
-        b, f = self(torch.tensor(x, dtype=torch.float).to(self.device))
-        b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
+        b, f, elt = self(torch.tensor(x, dtype=torch.float).to(self.device),predict=True)
+        b, f, elt = b.cpu().detach().numpy(), f.cpu().detach().numpy(), elt.cpu().detach().numpy()
         if len(x.shape) == 3: #je comprends pas trop ce qui se passe ici
             b = np.expand_dims(b, axis=-1)
             f = np.expand_dims(f, axis=-1)
         if return_backcast:
             return b, f
+        if return_prediction :
+            if len(x.shape)==3 : #pas tres clair a quoi sert cette ligne mais je pense qu'il faut proceder pareil pour elt
+                elt=np.expand_dims(elt,axis=-1)
+            return f, elt
         return f
 
-    def forward(self, backcast, print_season = False):
+    def forward(self, backcast, predict = False):
         backcast = squeeze_last_dim(backcast)
         forecast = torch.zeros(size=(backcast.size()[0], self.forecast_length,))
-       # element=torch.zeros(size=(len(self.stacks),backcast.size()[0], self.forecast_length))
+        print('------- backast size and forecast size ----------')
+        print(backcast.size())
+        print(forecast.size())
         for stack_id in range(len(self.stacks)):
             for block_id in range(len(self.stacks[stack_id])):
-                b, f = self.stacks[stack_id][block_id](backcast,print_season)
+                b, f = self.stacks[stack_id][block_id](backcast,predict)
                 backcast = backcast.to(self.device) - b
                 forecast = forecast.to(self.device) + f
-      #          element[stack_id,:,:]=element[stack_id,:,:].to(self.device) + f
-        return backcast, forecast
+        if predict :
+            prediction=torch.zeros(size=(len(self,stacks), backast.size()[], self.forecast_length)).to(self.device)
+            for stack_id in range(len(self.stacks)):
+                for block_id in range(len(self.stacks[stack_id])):
+                    b, f = self.stacks[stack_id][block_id](backcast,predict)
+                    backcast = backcast.to(self.device) - b
+                    forecast = forecast.to(self.device) + f
+                prediction[stack_id,:,:]=forecast 
+        return backcast, forecast, prediction
 
 
 def squeeze_last_dim(tensor):
