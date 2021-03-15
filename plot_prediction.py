@@ -5,7 +5,7 @@ import argparse
 import random as rd
 from tqdm import tqdm
 
-def main(signal,nb,predictions):
+def main(signal,epochs,nb,predictions):
 
     def merge_line(a,b,k):
         merge=np.zeros(a.shape[1]+b.shape[1])
@@ -21,18 +21,18 @@ def main(signal,nb,predictions):
 
     rep=[0,0,0]
     if not predictions[0]==None:
-        prediction_to_plot=np.loadtxt(predictionpath+'generic.txt')
+        prediction_to_plot=np.loadtxt(predictionpath+'generic_{}.txt'.format(epochs))
         rep[0]=1
     if not predictions[1]==None :
-        prediction2_to_plot=np.loadtxt(predictionpath+'seasonnality.txt')
+        prediction2_to_plot=np.loadtxt(predictionpath+'seasonnality_{}.txt'.format(epochs))
         rep[1]=1
     if not predictions[2]==None :
-        prediction3_to_plot=np.loadtxt(predictionpath+'trend.txt')
+        prediction3_to_plot=np.loadtxt(predictionpath+'trend_{}.txt'.format(epochs))
         rep[2]=1
 
         
     for i in tqdm(range(nb)) :
-  '/home/mathilde/time-series/data/lowfrequency2Sblocks/out/predictions0.png'       plt.figure(figsize=(10,10))
+        plt.figure(figsize=(10,10))
    
         k=rd.randint(0,xtrain.shape[0])
 
@@ -56,12 +56,13 @@ if __name__ == '__main__' :
 
     parser=argparse.ArgumentParser()
     parser.add_argument('signal', help='Name of the signal analyzed : signal')
+    parser.add_argument('epochs', help='indicate the number of epochs (used to find out the predictions files)')
     parser.add_argument('-idd', help='In order to store prediction without destroying other files')
     parser.add_argument('-p1', help='Prediction : Generic is expected (just say yes) ')
     parser.add_argument('-p2', help='Prediction : Seasonnality is expected (just say yes)')
     parser.add_argument('-p3', help='Prediction : Trend is expected (just say yes)')
     args=parser.parse_args()
     if args.idd :
-        main(args.signal,int(args.idd),[args.p1,args.p2,args.p3])
+        main(args.signal, int(args.epochs),int(args.idd),[args.p1,args.p2,args.p3])
     else :
-        main(args.signal,10,[args.p1,args.p2,args.p3])
+        main(args.signal,int(args.epochs),10,[args.p1,args.p2,args.p3])

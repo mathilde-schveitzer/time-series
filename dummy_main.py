@@ -43,7 +43,7 @@ def main(name,epochs=10,device='cpu'):
 
     predictions1=model1.predict(xtrain)
 
-    np.savetxt(predictionpath+'seasonnality.txt',predictions1)
+    np.savetxt(predictionpath+'seasonnality_{}.txt'.format(epochs),predictions1)
 
     #Definition of the generic  model :
   # thetas_dim2=4,
@@ -76,7 +76,9 @@ def main(name,epochs=10,device='cpu'):
  #   predictions3=model3.predict(xtrain)
    # np.savetxt(predictionpath+trend),predictions3)
 
-    plt.savefig('./data/{}/out/loss.png'.format(name))
+    plt.savefig('./data/{}/out/loss{}.png'.format(name,epochs))
+
+    print('---------- your signal name is {}, and the number of epochs was {} --------'.format(name,epochs))
 
     
 if __name__ == '__main__':
