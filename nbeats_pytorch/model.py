@@ -173,18 +173,20 @@ class NBeatsNet(nn.Module):
         print(forecast.size())
         for stack_id in range(len(self.stacks)):
             for block_id in range(len(self.stacks[stack_id])):
-                b, f = self.stacks[stack_id][block_id](backcast,predict)
+                b, f = self.stacks[stack_id][block_id](backcast)
                 backcast = backcast.to(self.device) - b
                 forecast = forecast.to(self.device) + f
         if predict :
-            prediction=torch.zeros(size=(len(self,stacks), backast.size()[], self.forecast_length))
+            prediction=torch.zeros(size=(len(self.stacks), backcast.size()[0], self.forecast_length))
             for stack_id in range(len(self.stacks)):
                 for block_id in range(len(self.stacks[stack_id])):
-                    b, f = self.stacks[stack_id][block_id](backcast,predict)
+                    b, f = self.stacks[stack_id][block_id](backcast)
                     backcast = backcast.to(self.device) - b
                     forecast = forecast.to(self.device) + f
                 prediction[stack_id,:,:]=forecast 
-        return backcast, forecast, prediction
+            return backcast, forecast, prediction
+        else :
+            return backcast, forecast
 
 
 def squeeze_last_dim(tensor):
@@ -193,19 +195,13 @@ def squeeze_last_dim(tensor):
     return tensor
 
 
-def seasonality_model(thetas, t, device, print_season=False):
+def seasonality_model(thetas, t, device):
     p = thetas.size()[-1]
     assert p <= thetas.shape[1], 'thetas_dim is too big.'
     p1, p2 = (p // 2, p // 2) if p % 2 == 0 else (p // 2, p // 2 + 1)
     s1 = torch.tensor([np.cos(2 * np.pi * i * t) for i in range(p1)]).float()  # H/2-1
     s2 = torch.tensor([np.sin(2 * np.pi * i * t) for i in range(p2)]).float()
     S = torch.cat([s1, s2])
-    if print_season:
-        print('-----------seasonality_model-----------------')
-        print("THETA DIM: " + str(thetas.size()))
-        print("S DIM: " + str(S.size()))
-        print(thetas)
-        
     return thetas.mm(S.to(device))
 
 
@@ -270,10 +266,10 @@ class SeasonalityBlock(Block):
             super(SeasonalityBlock, self).__init__(units, forecast_length, device, backcast_length,
                                                    forecast_length, share_thetas=True)
 
-    def forward(self, x, print_season=False):
+    def forward(self, x):
         x = super(SeasonalityBlock, self).forward(x)
-        backcast = seasonality_model(self.theta_b_fc(x), self.backcast_linspace, self.device, False)
-        forecast = seasonality_model(self.theta_f_fc(x), self.forecast_linspace, self.device, print_season)
+        backcast = seasonality_model(self.theta_b_fc(x), self.backcast_linspace, self.device)
+        forecast = seasonality_model(self.theta_f_fc(x), self.forecast_linspace, self.device)
         return backcast, forecast
 
 

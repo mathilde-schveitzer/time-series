@@ -40,7 +40,7 @@ def main(name,epochs=10,device='cpu'):
 
     model1.save('nbeats_test_seasonality.h5')
 
-    predictions1,elt=model1.predict(xtrain)
+    predictions1,elt=model1.predict(xtrain,return_prediction=True)
     
     torch.save(predictionpath+'seasonalityperblock.pt', elt)
     np.savetxt(predictionpath+'seasonnality.txt',predictions1)
