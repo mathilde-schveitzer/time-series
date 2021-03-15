@@ -154,17 +154,18 @@ class NBeatsNet(nn.Module):
 
     def predict(self, x, return_backcast=False, return_prediction=False):
         self.eval()
-        b, f, elt = self(torch.tensor(x, dtype=torch.float).to(self.device),predict=True)
-        b, f, elt = b.cpu().detach().numpy(), f.cpu().detach().numpy(), elt.cpu().detach().numpy()
+        b, f, predict = self(torch.tensor(x, dtype=torch.float).to(self.device),predict=True)
+        b, f = b.cpu().detach().numpy(), f.cpu().detach().numpy()
         if len(x.shape) == 3: #je comprends pas trop ce qui se passe ici
             b = np.expand_dims(b, axis=-1)
             f = np.expand_dims(f, axis=-1)
         if return_backcast:
             return b, f
         if return_prediction :
-            if len(x.shape)==3 : #pas tres clair a quoi sert cette ligne mais je pense qu'il faut proceder pareil pour elt
-                elt=np.expand_dims(elt,axis=-1)
-            return f, elt
+            components=np.zeros((predict.size()[0], predict.size()[1], predict.size()[2])) # 0=> nb block, 1=>nb de samples, 2=> forecast_length
+            for k in range(predict.size()[0]):
+                 components[k,:,:]=predict[k,:,:].cpu().detach().numpy()
+            return f, components
         return f
 
     def forward(self, backcast, predict = False):
@@ -185,7 +186,8 @@ class NBeatsNet(nn.Module):
                     b, f = self.stacks[stack_id][block_id](backcast)
                     backcast = backcast.to(self.device) - b
                     forecast = forecast.to(self.device) + f
-                prediction[stack_id,:,:]=forecast 
+                prediction[stack_id,:,:]=forecast
+            print('---------------- dim predict {} -----------'.format(prediction.size()))
             return backcast, forecast, prediction
         else :
             return backcast, forecast

@@ -26,13 +26,9 @@ def main(name,iterations=1000):
 
     # we generate the signal which will be analyzed
     length_seconds,sampling_rate=1000, 150 #that makes 15000 pts
-    freq_list=[]
-    for k in range(100):
-        f=rd.random()*10
-        freq_list.append(f)
-    poly=np.arange(12)
+    freq_list=[0.5]
     print('----creating the signal, plz wait------')
-    sig=gs.generate_signal(length_seconds, sampling_rate, freq_list, trend=poly)
+    sig=gs.generate_signal(length_seconds, sampling_rate, freq_list)
     print('finish : we start storing it in a csv file')
     gs.register_signal(sig[0],'./data/{}/signal'.format(name))
     plt.plot(sig[0])

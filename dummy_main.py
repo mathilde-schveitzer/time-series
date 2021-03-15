@@ -41,8 +41,9 @@ def main(name,epochs=10,device='cpu'):
     model1.save('nbeats_test_seasonality.h5')
 
     predictions1,elt=model1.predict(xtrain,return_prediction=True)
-    
-    np.savetxt(predictionpath+'seasonalityperblock_{}.pt'.format(epochs), elt)
+    print('------------ ELT.SHAPE----------- {}'.format(elt.shape))
+    for k in range(elt.shape[0]) :
+          np.savetxt(predictionpath+'seasonality_per_block_{}_{}.txt'.format(k,epochs), elt[k,:,:])
     np.savetxt(predictionpath+'seasonnality_{}.txt'.format(epochs),predictions1)
 
 
