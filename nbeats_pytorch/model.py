@@ -97,7 +97,6 @@ class NBeatsNet(nn.Module):
 
         store_loss=np.zeros(epochs)
         store_validation_loss=np.zeros(epochs)
-        xplot=np.arange(epochs)
 
         def split(arr, size): #fonction qui splite arr en mini tableau de taille max size (taille des batchs), en conservant la seconde dimension (=backast)
             arrays = []
@@ -145,13 +144,9 @@ class NBeatsNet(nn.Module):
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
 
-        plt.plot(xplot, store_loss, label='train loss_{}'.format(self.stack_types[0]))
-        plt.plot(xplot, store_validation_loss, label='validation loss_{}'.format(self.stack_types[0]))
-        plt.legend(loc='best')
-        plt.title('Loss evolution')
-
-       #torch.save(elements, 'element_{}.pt'.format(filename))
-
+        np.savetxt('./data/{}/out/trainloss.txt'.format(filename), store_loss)
+        np.savetxt('./data/{}/out/testloss.txt'.format(filename), store_validation_loss)
+            
     def predict(self, x, return_backcast=False, return_prediction=False):
         self.eval()
         b, f, predict = self(torch.tensor(x, dtype=torch.float).to(self.device),predict=True)

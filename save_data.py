@@ -9,7 +9,7 @@ import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
 
-def main(name,iterations=1000):
+def main(name,samples,nb):
     
     ''' First programm to execute. It sets datas format, therefor the following parameters shouldn't be modified then :
     - backcast and forecast length 
@@ -22,10 +22,11 @@ def main(name,iterations=1000):
     os.makedirs(datapath)
     os.makedirs('./data/{}/predictions'.format(name))
     os.makedirs('./data/{}/out'.format(name))
-
+    for k in range(nb) :
+        os.makedirs('./data/{}/predictions/nblocks_{}'.format(name,k)
     # we generate the signal which will be analyzed
     length_seconds,sampling_rate=1000, 150 #that makes 15000 pts
-    freq_list=[0.5,3]
+    freq_list=[0.5,0.3,0.2,4,5,6]
     print('----creating the signal, plz wait------')
     sig=gs.generate_signal(length_seconds, sampling_rate, freq_list)
     print('finish : we start storing it in a csv file')
@@ -45,6 +46,8 @@ def main(name,iterations=1000):
     np.savetxt(datapath+'/xtest.txt', xtest)
     np.savetxt(datapath+'/ytest.txt', ytest)
     print('--------- name of the file you used : {} ---------'.format(name))
+
+    trainandsave(name,epochs,device,nb)
     
 if __name__ == '__main__':
     parser=argparse.ArgumentParser()
