@@ -171,27 +171,23 @@ class NBeatsNet(nn.Module):
     def forward(self, backcast, predict = False):
         backcast = squeeze_last_dim(backcast)
         forecast = torch.zeros(size=(backcast.size()[0], self.forecast_length,))
-        print('------- backast size and forecast size ----------')
-        print(backcast.size())
-        print(forecast.size())
-        for stack_id in range(len(self.stacks)):
-            for block_id in range(len(self.stacks[stack_id])):
-                b, f = self.stacks[stack_id][block_id](backcast)
-                backcast = backcast.to(self.device) - b
-                forecast = forecast.to(self.device) + f
-        if predict :
+        if not predict :
+            for stack_id in range(len(self.stacks)):
+                for block_id in range(len(self.stacks[stack_id])):
+                    b, f = self.stacks[stack_id][block_id](backcast)
+                    backcast = backcast.to(self.device) - b
+                    forecast = forecast.to(self.device) + f
+            return backcast, forecast
+
+        else :
             prediction=torch.zeros(size=(len(self.stacks[0]), backcast.size()[0], self.forecast_length)).to(self.device)
             for stack_id in range(len(self.stacks)):
                 for block_id in range(len(self.stacks[stack_id])):
                     b, f = self.stacks[stack_id][block_id](backcast)
                     backcast = backcast.to(self.device) - b
                     forecast = forecast.to(self.device) + f
-                    prediction[block_id,:,:]=forecast
-            print('---------------- dim predict {} -----------'.format(prediction.size()))
+                    prediction[block_id,:,:]=f
             return backcast, forecast, prediction
-        else :
-            return backcast, forecast
-
 
 def squeeze_last_dim(tensor):
     if len(tensor.shape) == 3 and tensor.shape[-1] == 1:  # (128, 10, 1) => (128, 10).

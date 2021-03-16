@@ -76,9 +76,9 @@ def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], tr
             else:
                 signal = signal + np.sin(2*np.pi*frequencies_list[k]*time)
     
-    for t in range(len(signal)) :       
-        amplitude = np.random.uniform(low=0, high=10, size=(len(trend),))
-        signal[t]=sum(amplitude[k]*trend[k]*signal[t]**k for k in range(len(trend)))
+   # for t in range(len(signal)) :       
+   #     amplitude = np.random.uniform(low=0, high=10, size=(len(trend),))
+   #     signal[t]=sum(amplitude[k]*trend[k]*signal[t]**k for k in range(len(trend)))
                
     if add_noise:
         print(signal.shape)
