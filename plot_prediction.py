@@ -35,22 +35,25 @@ def main(signal, epochs, nb, predictions, nblock=0):
    
         k=rd.randint(0,xtrain.shape[0])
 
+
         plt.plot(merge_line(xtrain,ytrain,k),label="original signal")
     
         if rep[0]==1 :
             plt.plot(merge_line(xtrain,prediction_to_plot,k),label='Predicted with Generic Block')
         if rep[1]==1:
-            plt.plot(merge_line(xtrain,prediction2_to_plot,k), label='Predicted with Seasonnability Block')
+            print(prediction2_to_plot)
+            plt.plot(merge_line(xtrain,prediction2_to_plot,k), label='Predicted with Seasonnality Block')       
         if rep[2]==1:
             plt.plot(merge_line(xtrain,prediction3_to_plot,k), label='Predicted with Trendy Block')
        
         for id_block in range(nblock):
-            prediction_per_block=np.loadtxt(predictionpath+"seasonality_per_block_{}_{}.txt".format(id_block,epochs))
+            prediction_per_block=np.loadtxt(predictionpath+"seasonnality_per_block_{}_{}.txt".format(id_block,epochs))
+
             plt.plot(merge_line(xtrain,prediction_per_block,k),label="Predicted with block num = {}".format(id_block))
         plt.title('predictions num={}'.format(i))
-        plt.savefig('./data/{}/out/predictions{}.png'.format(signal,i))
         plt.legend(loc='best')
-
+       #    plt.savefig('./data/{}/out/predictions{}.png'.format(signal,i))
+        plt.show()
          
             
 if __name__ == '__main__' :
@@ -62,10 +65,9 @@ if __name__ == '__main__' :
     parser.add_argument('-p1', help='Prediction : Generic is expected (just say yes) ')
     parser.add_argument('-p2', help='Prediction : Seasonnality is expected (just say yes)')
     parser.add_argument('-p3', help='Prediction : Trend is expected (just say yes)')
-    parser.add_argument('-f', help='Say true if you want to plot what each block is predicting')
     parser.add_argument('-nblock', help='precise the number of block (TODO : integrate it in the txt file)')
     args=parser.parse_args()
-    if args.f :
-        main(args.signal, int(args.epochs),int(args.nb),[args.p1,args.p2,args.p3], True, int(args.nblock))
+    if args.nblock :
+        main(args.signal, int(args.epochs),int(args.nb),[args.p1,args.p2,args.p3], int(args.nblock))
     else :
         main(args.signal,int(args.epochs), int(args.nb),[args.p1,args.p2,args.p3])

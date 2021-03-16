@@ -17,7 +17,6 @@ def main(name,iterations=1000):
     - signal : choose the caracteristics of the signal that will be analyzed.
 
     Datas are stored in file.txt easely exploitable, following the format : xtrain_name.txt'''
-
     #we create the directories that will be usefull afterward
     datapath='./data/{}/datas'.format(name)
     os.makedirs(datapath)
@@ -26,7 +25,7 @@ def main(name,iterations=1000):
 
     # we generate the signal which will be analyzed
     length_seconds,sampling_rate=1000, 150 #that makes 15000 pts
-    freq_list=[0.05]
+    freq_list=[0.5,3]
     print('----creating the signal, plz wait------')
     sig=gs.generate_signal(length_seconds, sampling_rate, freq_list)
     print('finish : we start storing it in a csv file')
