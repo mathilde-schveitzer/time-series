@@ -25,7 +25,7 @@ def trainandsave(name,device,nb):
     #Reminder of the hyperparameter
     backcast_length = 100
     forecast_length = 100
-    epochs=2
+    epochs=5000
 
     
     #Definition of the seasonality  model :
