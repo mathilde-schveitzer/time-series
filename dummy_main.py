@@ -29,11 +29,12 @@ def trainandsave(name,device,nb):
 
     
     #Definition of the seasonality  model :
+   
+    thetas_dim=(4,4,4)
+    stack_types=NBeatsNet.SEASONALITY_BLOCK,
     for k in range(1,nb+1):
-        thetas_dim=tuple(4*np.ones(k,int))
-        stack_types=NBeatsNet.SEASONALITY_BLOCK,
-        model= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types, nb_blocks_per_stack=k, thetas_dim=thetas_dim, share_weights_in_stack=True, hidden_layer_units=32)
-
+        
+        model= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types, nb_blocks_per_stack=3, thetas_dim=thetas_dim, share_weights_in_stack=True, hidden_layer_units=2**k)
         model.compile_model(loss='mae', learning_rate=1e-5)
         model.fit(xtrain, ytrain, name, nb, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
 
