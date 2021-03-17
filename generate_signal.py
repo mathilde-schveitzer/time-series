@@ -87,9 +87,12 @@ def generate_signal(length_seconds, sampling_rate, frequencies_list, func=[], tr
         signal = signal + noise
 
     if plot:
-        plt.plot(time, signal.T)  
+        xtrain = np.zeros(200)
+        k=rd.randint(0,signal.size-200)
+        xtrain=signal[k:k+200]
+        plt.plot(xtrain)  
         plt.show()
-       
+        
     return signal,time,length_seconds
 
 def perturbation(signal,time,length_seconds):
@@ -144,3 +147,12 @@ def read_signal(filename):
         for line in reader:
             x_tl.append(line)
     return(np.array(x_tl))
+
+def main():
+    freq=[0.5,5,10,100]
+    length_seconds=100
+    sampling_rate=150
+    generate_signal(length_seconds, sampling_rate, freq, plot=True)
+
+if __name__=='__main__':
+    main()

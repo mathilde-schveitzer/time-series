@@ -93,7 +93,7 @@ class NBeatsNet(nn.Module):
         self._opt = optim.Adam(lr=learning_rate, params=self.parameters())
         self._loss = loss_
 
-    def fit(self, x_train, y_train, filename, validation_data=None, epochs=10, batch_size=32):
+    def fit(self, x_train, y_train, filename, nb, validation_data=None, epochs=10, batch_size=32):
 
         store_loss=np.zeros(epochs)
         store_validation_loss=np.zeros(epochs)
@@ -144,8 +144,8 @@ class NBeatsNet(nn.Module):
                   f'{int(elapsed_time)}s {time_per_step}ms/step - '
                   f'loss: {train_loss:.4f} - val_loss: {test_loss:.4f}')
 
-        np.savetxt('./data/{}/out/trainloss.txt'.format(filename), store_loss)
-        np.savetxt('./data/{}/out/testloss.txt'.format(filename), store_validation_loss)
+        np.savetxt('./data/{}/out/trainloss_{}.txt'.format(filename,nb), store_loss)
+        np.savetxt('./data/{}/out/testloss_{}.txt'.format(filename,nb), store_validation_loss)
             
     def predict(self, x, return_backcast=False, return_prediction=False):
         self.eval()

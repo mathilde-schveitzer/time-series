@@ -15,7 +15,7 @@ def trainandsave(name,device,nb):
     - name should be the same as save_data's args.name
     Be carefull you choose the same set of hyperparameters
     It shows the loss. In order to show the signal and its prediction as a function of the NN, the predictions are stored in a txt file'''
-    predictionpath='./data/{}/predictions/'.format(name)
+    predictionpath='./data/{}/predictions'.format(name)
     datapath='./data/{}/datas'.format(name)
     xtrain=np.loadtxt(datapath+'/xtrain.txt'.format(name))
     ytrain=np.loadtxt(datapath+'/ytrain.txt'.format(name))
@@ -25,23 +25,20 @@ def trainandsave(name,device,nb):
     #Reminder of the hyperparameter
     backcast_length = 100
     forecast_length = 100
-    epochs=5000
+    epochs=2
 
     
     #Definition of the seasonality  model :
     for k in range(1,nb+1):
-        thetas_dim=tuple(4*np.ones(nb,int))
-        stack_types=[]
-        for i in range(nb):
-            stack_types.append(NBeatsNet.SEASONALITY_BLOCK)
-        stack_types=tuple(stack_types)
-        model= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types, nb_blocks_per_stack=nb, thetas_dim=thetas_dim, share_weights_in_stack=True, hidden_layer_units=32)
+        thetas_dim=tuple(4*np.ones(k,int))
+        stack_types=NBeatsNet.SEASONALITY_BLOCK,
+        model= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types, nb_blocks_per_stack=k, thetas_dim=thetas_dim, share_weights_in_stack=True, hidden_layer_units=32)
 
         model.compile_model(loss='mae', learning_rate=1e-5)
-        model1.fit(xtrain, ytrain, name, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
+        model.fit(xtrain, ytrain, name, nb, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
 
         predictions,elt=model.predict(xtrain,return_prediction=True)
         
         for block in range(elt.shape[0]) :
-            np.savetxt(predictionpath+'seasonnality_per_block_{}_nb{}.txt'.format(block,nb), elt[block,:,:])
-        np.savetxt(predictionpath+'seasonnalitytotale_nb{}.txt'.format(nb),predictions1)
+            np.savetxt(predictionpath+'/nblocks_{}/seasonnality_per_block_{}.txt'.format(k,block), elt[block,:,:])
+        np.savetxt(predictionpath+'/seasonnalitytotale_nb{}.txt'.format(k),predictions)
