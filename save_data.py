@@ -18,7 +18,7 @@ def main(name,nb,device='cpu',samples=5000):
     - signal : choose the caracteristics of the signal that will be analyzed.
 
     Datas are stored in file.txt easely exploitable, following the format : xtrain_name.txt'''
-    #we create the directories that will be usefull afterward
+    #we create the directories that will be usefull afterwards
     datapath='./data/{}/datas'.format(name)
     os.makedirs(datapath)
     os.makedirs('./data/{}/predictions'.format(name))

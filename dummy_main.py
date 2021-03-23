@@ -25,7 +25,7 @@ def trainandsave(name,device,nb):
     #Reminder of the hyperparameter
     backcast_length = 100
     forecast_length = 100
-    epochs=2
+    epochs=5000
 
     
     #Definition of the seasonality  model :
@@ -35,7 +35,7 @@ def trainandsave(name,device,nb):
         model= NBeatsNet(device=torch.device(device),backcast_length=backcast_length, forecast_length=forecast_length, stack_types=stack_types, nb_blocks_per_stack=k, thetas_dim=thetas_dim, share_weights_in_stack=True, hidden_layer_units=32)
 
         model.compile_model(loss='mae', learning_rate=1e-5)
-        model.fit(xtrain, ytrain, name, nb, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
+        model.fit(xtrain, ytrain, name, k, validation_data=(xtest,ytest), epochs=epochs, batch_size=150)
 
         predictions,elt=model.predict(xtrain,return_prediction=True)
         
