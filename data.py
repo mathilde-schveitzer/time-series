@@ -60,6 +60,4 @@ def get_data(backast_length, forecast_length, limit, filename,copy=1):
 
         xtest=np.vstack((xtest, time_series_cleaned_fortesting_x))
         ytest=np.vstack((ytest, time_series_cleaned_fortesting_y))
-
     return xtrain, ytrain, xtest, ytest
-
